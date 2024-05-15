@@ -10,8 +10,6 @@ services:
       - 2181:2181
     environment:
       - ALLOW_ANONYMOUS_LOGIN=yes
-    networks:
-      - poc
 
   nifi-registry:
     image: "apache/nifi-registry:latest"
@@ -21,12 +19,12 @@ services:
       - 19090:19090
     volumes:
       - ./configs/nifi_registry_current/conf:/opt/nifi-registry/nifi-registry-current/conf
+      - ./configs/nifi_registry_current/database:/opt/nifi-registry/nifi-registry-current/database
+      - ./configs/nifi_registry_current/flow_storage:/opt/nifi-registry/nifi-registry-current/flow_storage
     # uncomment one line above after execute `make nifi-registry-config`
     environment:
       - NIFI_REGISTRY_WEB_HTTP_PORT=19090
     restart: on-failure
-    networks:
-      - poc
 
   nifi:
     build:
@@ -57,9 +55,8 @@ services:
       - NIFI_ELECTION_MAX_WAIT=1 min
       - NIFI_SENSITIVE_PROPS_KEY='12345678901234567890A'
     restart: always
-    networks:
-      - poc
 
 networks:
-  poc:
-    driver: bridge
+  default:
+    external:
+      name: poc

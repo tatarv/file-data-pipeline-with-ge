@@ -46,3 +46,5 @@ nifi-config:
 
 nifi-registry-config:
 	docker cp nifi-registry:/opt/nifi-registry/nifi-registry-current/conf ./configs/nifi_registry_current
+	docker cp nifi-registry:/opt/nifi-registry/nifi-registry-current/database ./configs/nifi_registry_current
+	docker cp nifi-registry:/opt/nifi-registry/nifi-registry-current/flow_storage ./configs/nifi_registry_current
