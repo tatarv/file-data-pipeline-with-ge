@@ -43,3 +43,6 @@ console:
 
 nifi-config:
 	docker cp nifi:/opt/nifi/nifi-current/conf ./configs
+
+nifi-registry-config:
+	docker cp nifi-registry:/opt/nifi-registry/nifi-registry-current/conf ./configs/nifi_registry_current
