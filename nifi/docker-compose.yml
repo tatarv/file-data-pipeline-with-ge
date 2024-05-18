@@ -42,6 +42,7 @@ services:
       - ./configs/provenance_repository:/opt/nifi/nifi-current/provenance_repository
       - ./configs/state:/opt/nifi/nifi-current/state
       - ./configs/logs:/opt/nifi/nifi-current/logs
+      - ./minio_sites:/opt/nifi/nifi-current/minio_sites
       # uncomment two lines below after execute `make nifi-config`
       - ./configs/conf:/opt/nifi/nifi-current/conf
       - ./configs/drivers:/opt/nifi/drivers
