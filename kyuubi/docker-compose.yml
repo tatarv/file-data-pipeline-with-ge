@@ -1,0 +1,19 @@
+version: "3"
+
+services:
+  kyuubi:
+    hostname: kyuubi
+    container_name: kyuubi
+    image: apache/kyuubi:1.8.0-spark
+    volumes:
+      - ./kyuubi-config/kyuubi-defaults.conf:/opt/kyuubi/conf/kyuubi-defaults.conf
+    ports:
+      - "10009:10009"
+      - "10099:10099"
+    # depends_on:
+    #   - spark-master
+
+networks:
+  default:
+    external:
+      name: poc
