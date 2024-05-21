@@ -11,10 +11,12 @@ def merge_delta(delta_table, new_data, merge_key):
                 f"old_data.{merge_key} = new_data.{merge_key}"
             )
             .whenMatchedUpdate(set = {
-                "name": col("new_data.name")
+                "first_name": col("new_data.first_name"),
+                "total": col("new_data.total")
             })
             .whenNotMatchedInsert(values = {
-                "name": col("new_data.name")
+                "first_name": col("new_data.first_name"),
+                "total": col("new_data.total")
             })
             .execute()
     )
@@ -32,21 +34,36 @@ def create_delta(new_data, delta_path, schema, table):
 
 
 def main():
-    source_bucket = "datalake-landing"
+    source_bucket = None
     target_bucket = "datalake"
     schema = "datalake"
-    table = "test_table"
-    primary_key = "name"
+    table = "agg_table"
+    primary_key = "first_name"
+
+    agg_query = """
+    WITH splitted_names as (
+        SELECT 
+            split(name, ' ')[0] as first_name, 
+            split(name, ' ')[1] as last_name
+        FROM datalake.test_table
+    )
+
+    SELECT 
+    first_name, count(1) total
+    FROM splitted_names
+    GROUP BY first_name
+    ORDER BY total desc
+    ;
+    """
 
     spark = SparkSession.builder \
-        .appName("CSV File to Delta Lake Table") \
+        .appName("Create Agg Delta Table") \
         .enableHiveSupport() \
         .getOrCreate()
 
-    input_path = f"s3a://{source_bucket}/*.csv"
     delta_path = f"s3a://{target_bucket}/delta/datalake/tables/{table}"
 
-    new_data = spark.read.csv(input_path, header=True, inferSchema=True)
+    new_data = spark.sql(agg_query)
     new_data.show(10)
 
     spark.sql(f"CREATE DATABASE IF NOT EXISTS {schema}")
