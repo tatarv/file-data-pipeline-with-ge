@@ -1,0 +1,23 @@
+version: "3"
+
+services:
+  spark-notebook:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: spark-notebook
+    user: root
+    environment:
+      - JUPYTER_ENABLE_LAB="yes"
+      - GRANT_SUDO="yes"
+    volumes:
+      - ./work:/home/jovyan/work
+      - ./jupyter-config/spark-defaults.conf:/usr/local/spark/conf/spark-defaults.conf
+    ports:
+      - "8888:8888"
+      - "4040:4040"
+
+networks:
+  default:
+    external:
+      name: poc
