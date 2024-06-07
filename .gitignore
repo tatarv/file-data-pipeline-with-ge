@@ -170,3 +170,6 @@ cython_debug/
 
 # metabase
 /metabase/metabase-data/
+
+# jupyter
+/jupyter/work/metastore_db/
