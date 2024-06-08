@@ -54,8 +54,8 @@ x-airflow-common:
   environment:
     &airflow-common-env
     AIRFLOW__CORE__EXECUTOR: CeleryExecutor
-    AIRFLOW__DATABASE__SQL_ALCHEMY_CONN: postgresql+psycopg2://airflow:airflow@postgres/airflow
-    AIRFLOW__CELERY__RESULT_BACKEND: db+postgresql://airflow:airflow@postgres/airflow
+    AIRFLOW__DATABASE__SQL_ALCHEMY_CONN: postgresql+psycopg2://airflow:airflow@postgres-airflow:5432/airflow
+    AIRFLOW__CELERY__RESULT_BACKEND: db+postgresql://airflow:airflow@postgres-airflow:5432/airflow
     AIRFLOW__CELERY__BROKER_URL: redis://:@redis:6379/0
     AIRFLOW__CORE__FERNET_KEY: ''
     AIRFLOW__CORE__DAGS_ARE_PAUSED_AT_CREATION: 'true'
@@ -87,6 +87,7 @@ x-airflow-common:
 
 services:
   postgres:
+    container_name: postgres-airflow
     image: postgres:13
     environment:
       POSTGRES_USER: airflow
@@ -100,6 +101,8 @@ services:
       retries: 5
       start_period: 5s
     restart: always
+    ports:
+      - "5433:5432"
 
   redis:
     # Redis is limited to 7.2-bookworm due to licencing change
@@ -118,8 +121,11 @@ services:
   airflow-webserver:
     <<: *airflow-common
     command: webserver
+    container_name: airflow-webserver
     ports:
       - "8080:8080"
+    environment:
+      - AIRFLOW__CORE__SQL_ALCHEMY_CONN=postgresql+psycopg2://airflow:airflow@postgres-airflow:5432/airflow
     healthcheck:
       test: ["CMD", "curl", "--fail", "http://localhost:8080/health"]
       interval: 30s
